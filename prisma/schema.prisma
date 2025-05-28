@@ -1,0 +1,22 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Bytes    @id
+  username   String   @unique
+  phone      String   @unique
+  name       String?
+  password   String
+  updated_at DateTime
+  created_at DateTime
+
+  @@index([id], map: "index_user_id")
+  @@map("users")
+}
