@@ -1,13 +1,38 @@
+import { fastifyCors } from '@fastify/cors';
+import { fastifySwagger } from '@fastify/swagger';
+import { fastifySwaggerUi } from '@fastify/swagger-ui';
 import 'dotenv/config';
-import fastify from 'fastify';
-import { createUserModule } from './infra/http/modules/user/userModule';
+import { fastify } from 'fastify';
+import {
+  jsonSchemaTransform,
+  serializerCompiler,
+  validatorCompiler,
+  ZodTypeProvider,
+} from 'fastify-type-provider-zod';
 import { userRoutes } from './infra/http/modules/user/userRoutes';
 
-const app = fastify();
+const app = fastify().withTypeProvider<ZodTypeProvider>();
 
-const { userController } = createUserModule();
+app.setValidatorCompiler(validatorCompiler);
+app.setSerializerCompiler(serializerCompiler);
 
-app.register((app) => userRoutes(app, userController), {
+app.register(fastifyCors, { origin: '*' });
+
+app.register(fastifySwagger, {
+  openapi: {
+    info: {
+      title: 'BuildMode API',
+      version: '1.0.0',
+    },
+  },
+  transform: jsonSchemaTransform,
+});
+
+app.register(fastifySwaggerUi, {
+  routePrefix: '/api/v1/docs',
+});
+
+app.register((app) => userRoutes(app), {
   prefix: '/api/v1/',
 });
 
