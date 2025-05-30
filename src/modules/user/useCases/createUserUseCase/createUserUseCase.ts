@@ -15,6 +15,7 @@ interface CreateUserRequest {
 
 export class CreateUserUseCase {
   constructor(private userRepository: UserRepository) {}
+
   async execute({
     username,
     phone,
